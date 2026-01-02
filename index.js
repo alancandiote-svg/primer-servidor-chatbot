@@ -1,25 +1,31 @@
-require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
+const path = require("path");
 const OpenAI = require("openai");
 
 const app = express();
-app.use(cors());
-app.use(express.json());
 
+// 👉 CONFIG OPENAI
 const client = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
-// Ruta de prueba
+app.use(cors());
+app.use(express.json());
+
+// 👉 MOSTRAR INTERFAZ WEB
 app.get("/", (req, res) => {
-  res.send("API de Chatbot activa 🤖");
+  res.sendFile(path.join(__dirname, "index.html"));
 });
 
-// Ruta del chatbot
+// 👉 CHATBOT IA
 app.post("/chat", async (req, res) => {
   try {
     const userMessage = req.body.message;
+
+    if (!userMessage) {
+      return res.status(400).json({ error: "Mensaje vacío" });
+    }
 
     const response = await client.chat.completions.create({
       model: "gpt-4.1-mini",
@@ -32,16 +38,14 @@ app.post("/chat", async (req, res) => {
     res.json({
       reply: response.choices[0].message.content,
     });
-
   } catch (error) {
     console.error("ERROR OPENAI:", error);
-    res.status(500).json({
-      error: error.message || "Error desconocido con la IA",
-    });
+    res.status(500).json({ error: "Error con la IA" });
   }
 });
 
-const PORT = 3000;
+// 👉 PUERTO (LOCAL + RENDER)
+const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-  console.log(`Servidor activo en http://localhost:${PORT}`);
+  console.log(`Servidor activo en puerto ${PORT}`);
 });

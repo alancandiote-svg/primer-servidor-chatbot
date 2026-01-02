@@ -1,42 +1,92 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8">
   <title>Chatbot IA</title>
   <style>
-    body { font-family: Arial; background: #f4f4f4; }
-    #chat { width: 400px; margin: 40px auto; background: white; padding: 20px; border-radius: 8px; }
-    #messages { height: 300px; overflow-y: auto; margin-bottom: 10px; }
-    .user { text-align: right; color: blue; }
-    .bot { text-align: left; color: green; }
+    body {
+      font-family: Arial, sans-serif;
+      background: #f2f2f2;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    #chat {
+      background: white;
+      width: 360px;
+      height: 520px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.2);
+      display: flex;
+      flex-direction: column;
+    }
+    #messages {
+      flex: 1;
+      padding: 10px;
+      overflow-y: auto;
+    }
+    .user {
+      text-align: right;
+      margin: 6px;
+      color: blue;
+    }
+    .bot {
+      text-align: left;
+      margin: 6px;
+      color: green;
+    }
+    #input {
+      display: flex;
+      border-top: 1px solid #ccc;
+    }
+    input {
+      flex: 1;
+      padding: 10px;
+      border: none;
+      outline: none;
+    }
+    button {
+      padding: 10px;
+      background: #4CAF50;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
   </style>
 </head>
 <body>
-  <div id="chat">
-    <h3>Chatbot IA 🤖</h3>
-    <div id="messages"></div>
-    <input id="input" placeholder="Escribe tu mensaje..." style="width: 80%" />
+
+<div id="chat">
+  <div id="messages"></div>
+  <div id="input">
+    <input id="text" placeholder="Escribe tu mensaje..." />
     <button onclick="sendMessage()">Enviar</button>
   </div>
+</div>
 
-  <script>
-    async function sendMessage() {
-      const input = document.getElementById("input");
-      const messages = document.getElementById("messages");
-      const text = input.value;
+<script>
+async function sendMessage() {
+  const input = document.getElementById("text");
+  const messages = document.getElementById("messages");
+  const text = input.value;
 
-      messages.innerHTML += `<div class="user">${text}</div>`;
-      input.value = "";
+  if (!text) return;
 
-      const res = await fetch("http://localhost:3000/chat", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message: text })
-      });
+  messages.innerHTML += `<div class="user">${text}</div>`;
+  input.value = "";
 
-      const data = await res.json();
-      messages.innerHTML += `<div class="bot">${data.reply}</div>`;
-    }
-  </script>
+  const response = await fetch("/chat", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ message: text })
+  });
+
+  const data = await response.json();
+  messages.innerHTML += `<div class="bot">${data.reply}</div>`;
+  messages.scrollTop = messages.scrollHeight;
+}
+</script>
+
 </body>
 </html>
