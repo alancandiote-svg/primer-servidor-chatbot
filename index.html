@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Chatbot IA</title>
+  <style>
+    body { font-family: Arial; background: #f4f4f4; }
+    #chat { width: 400px; margin: 40px auto; background: white; padding: 20px; border-radius: 8px; }
+    #messages { height: 300px; overflow-y: auto; margin-bottom: 10px; }
+    .user { text-align: right; color: blue; }
+    .bot { text-align: left; color: green; }
+  </style>
+</head>
+<body>
+  <div id="chat">
+    <h3>Chatbot IA 🤖</h3>
+    <div id="messages"></div>
+    <input id="input" placeholder="Escribe tu mensaje..." style="width: 80%" />
+    <button onclick="sendMessage()">Enviar</button>
+  </div>
+
+  <script>
+    async function sendMessage() {
+      const input = document.getElementById("input");
+      const messages = document.getElementById("messages");
+      const text = input.value;
+
+      messages.innerHTML += `<div class="user">${text}</div>`;
+      input.value = "";
+
+      const res = await fetch("http://localhost:3000/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message: text })
+      });
+
+      const data = await res.json();
+      messages.innerHTML += `<div class="bot">${data.reply}</div>`;
+    }
+  </script>
+</body>
+</html>
