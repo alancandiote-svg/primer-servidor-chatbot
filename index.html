@@ -79,25 +79,49 @@
 
 <script>
   const messagesDiv = document.getElementById("messages");
+  const input = document.getElementById("text");
 
   function addMessage(text, sender) {
     const msg = document.createElement("div");
     msg.className = sender;
     msg.innerText = text;
     messagesDiv.appendChild(msg);
+    messagesDiv.scrollTop = messagesDiv.scrollHeight;
   }
 
-  // 👇 MENSAJE INICIAL DEL BOT
+  // Mensaje inicial del bot
   window.onload = () => {
     addMessage(
-      "Hola 🌚, soy Alan Candiote 🦧.\n\n" +
-      "TE AMO CUY HERMOSA:\n" ,
-    
-      
+      "Hola 🌚, soy Alan Candiote 🦧.",
       "bot"
     );
+    addMessage("TE AMO CUY HERMOSA.", "bot");
   };
+
+  async function sendMessage() {
+    const message = input.value.trim();
+    if (!message) return;
+
+    addMessage(message, "user");
+    input.value = "";
+
+    try {
+      const response = await fetch("/chat", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ message })
+      });
+
+      const data = await response.json();
+      addMessage(data.reply, "bot");
+    } catch (error) {
+      addMessage("❌ Error al conectar con el servidor", "bot");
+    }
+  }
 </script>
+
 
 
 </body>
